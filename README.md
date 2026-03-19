@@ -1,2 +1,5 @@
-# DASS-Assignement-2
-assignment
+# Instructions To Run
+
+```
+python main.py
+```

@@ -1,33 +1,43 @@
-"""Race simulation module."""
+"""Race Management module for StreetRace Manager.
+Creates races and selects appropriate drivers and cars from the system.
+"""
 import random
 
+
 class Race:
+    """Manages a single race event."""
+
     def __init__(self, track_name, difficulty):
         self.track_name = track_name
         self.difficulty = difficulty  # 1 (Easy) to 5 (Hard)
+        self.prize_money = difficulty * 1000  # Higher difficulty = more prize
 
     def run_race(self, team):
         """
-        Simulate a race for a verified Team. 
-        Returns a raw race_time dict object based on team's attributes.
+        Simulate a race for a registered Team.
+        Business Rule 2: Only crew members with the Driver role may enter a race.
+        Returns a raw result dict with status, time, and prize.
         """
         if not team.is_registered:
             raise ValueError("Team is not officially registered for racing!")
-            
-        # Consume fuel for the race (Requires Integration with inventory.py)
-        if not team.inventory.consume_fuel(self.difficulty * 100):
-            return {"team_id": team.team_id, "status": "DNF", "reason": "Out of Fuel"}
 
-        # Calculate performance based on crew size
-        crew_efficiency = len(team.roster.members) * 10
-        
-        # Base time minus efficiency, plus random obstacle factor
-        # Higher difficulty increases base time
+        # Business Rule 2: Only Drivers may race
+        drivers = team.roster.get_drivers()
+        if not drivers:
+            raise ValueError("Cannot race: Team has no Driver in crew!")
+
+        # Driver skill affects performance
+        avg_skill = sum(d.skill_level for d in drivers) / len(drivers)
+        efficiency = avg_skill * 10
+
+        # Calculate race time
         base_time = self.difficulty * 100
-        completion_time = base_time - crew_efficiency + random.randint(0, 50)
-        
+        completion_time = base_time - efficiency + random.randint(0, 50)
+
         return {
             "team_id": team.team_id,
-            "status": "Completed", 
-            "time": completion_time
+            "team": team,
+            "status": "Completed",
+            "time": completion_time,
+            "prize": self.prize_money
         }

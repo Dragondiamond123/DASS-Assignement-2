@@ -1,5 +1,5 @@
+"""Dice simulation for MoneyPoly."""
 import random
-from moneypoly.config import BOARD_SIZE
 
 class Dice:
     """Simulates a pair of six-sided dice with consecutive-doubles tracking."""

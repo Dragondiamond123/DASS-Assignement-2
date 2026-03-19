@@ -1,9 +1,13 @@
 """Core Integration Tests for Space Mission System."""
 import pytest
+import random
 from integration.code.registration import Team
 from integration.code.race import Race
 from integration.code.mission import MissionControl
 from integration.code.results import RaceResultProcessor, global_leaderboard
+
+# Fix randomness
+random.seed(0)
 
 # Test 1: Register + race success
 def test_register_and_race():
@@ -24,11 +28,8 @@ def test_race_without_registration():
     team = Team("Beta")
     race = Race("Track1", 2)
 
-    try:
+    with pytest.raises(ValueError):
         race.run_race(team)
-        assert False
-    except ValueError:
-        assert True
 
 # Test 3: Results update leaderboard
 def test_results_update_leaderboard():
@@ -64,8 +65,15 @@ def test_mission_execution():
 def test_mission_no_team():
     mission = MissionControl("M1")
 
-    try:
+    with pytest.raises(RuntimeError):
         mission.execute_mission()
-        assert False
-    except RuntimeError:
-        assert True
+
+# Test 6: Missing inventory condition
+def test_inventory_required_for_registration():
+    team = Team("Delta")
+    team.roster.add_member("AA", "Pilot")
+    team.roster.add_member("BB", "Engineer")
+
+    # No Engine Core added -> should fail
+    with pytest.raises(RuntimeError):
+        team.complete_registration()

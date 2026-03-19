@@ -9,6 +9,11 @@ from integration.code.results import RaceResultProcessor, global_leaderboard
 # Fix randomness
 random.seed(0)
 
+@pytest.fixture(autouse=True)
+def clear_leaderboard():
+    """Automatically reset the global leaderboard before every test to prevent state leakage."""
+    global_leaderboard.standings.clear()
+
 # Test 1: Register + race success
 def test_register_and_race():
     team = Team("Alpha")
@@ -33,8 +38,6 @@ def test_race_without_registration():
 
 # Test 3: Results update leaderboard
 def test_results_update_leaderboard():
-    global_leaderboard.standings.clear()
-
     data = [
         {"team_id": "T1", "status": "Completed", "time": 50},
         {"team_id": "T2", "status": "Completed", "time": 60},

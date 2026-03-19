@@ -117,3 +117,51 @@ def test_mission_missing_required_role():
     
     with pytest.raises(RuntimeError, match="requires a Mechanic"):
         mission.add_team(team)
+
+
+# Test 8: Complete race end-to-end and verify prize money updates inventory
+def test_race_prize_updates_inventory():
+    """Completing a race and verifying results and prize money update the inventory."""
+    team = make_ready_team("Prize Team")
+    initial_cash = team.inventory.cash_balance  # 5000
+
+    race = Race("Grand Prix", 3)   # prize = 3000
+    result = race.run_race(team)
+
+    # Process race result through the results module
+    processor = RaceResultProcessor([result])
+    processor.calculate_points()
+
+    # Business Rule 4: Cash balance must have increased by prize money
+    assert team.inventory.cash_balance > initial_cash
+
+
+# Test 9: Damaged car mission requires mechanic check
+def test_damaged_car_requires_mechanic():
+    """If a car is damaged, a rescue mission requiring a mechanic must verify availability."""
+    team = Team("Repair Crew")
+    team.register_member("Ace Racer", "Driver")
+    # No mechanic added — can't do a rescue/repair mission
+    team.inventory.add_car("Damaged Car")
+    team.complete_registration()
+
+    mission = MissionControl("Emergency Repair", mission_type="rescue")
+
+    # Business Rule 3: Requires Mechanic, but team has none
+    with pytest.raises(RuntimeError, match="requires a Mechanic"):
+        mission.add_team(team)
+
+
+# Test 10: A crew member must be registered before entering a race
+def test_crew_must_register_before_race():
+    """Business Rule 1: A crew member must be registered before a role can be assigned and used."""
+    team = Team("Unregistered Crew")
+    # Add a Driver but do not register the team
+    team.register_member("Quick Sam", "Driver")
+    team.inventory.add_car("Speedy Car")
+    # Intentionally skipping complete_registration()
+
+    race = Race("Sprint", 1)
+    with pytest.raises(ValueError, match="not officially registered"):
+        race.run_race(team)
+

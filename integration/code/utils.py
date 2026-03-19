@@ -1,4 +1,4 @@
-"""Utility functions for the space mission system."""
+"""Utility functions for StreetRace Manager."""
 import uuid
 
 def generate_id(prefix="ID"):

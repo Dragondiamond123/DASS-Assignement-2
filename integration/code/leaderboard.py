@@ -1,4 +1,6 @@
-"""Global leaderboard management."""
+"""Leaderboard module for StreetRace Manager.
+Tracks global rankings and points across all races.
+"""
 
 class Leaderboard:
     def __init__(self):

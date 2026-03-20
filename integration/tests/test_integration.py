@@ -165,3 +165,21 @@ def test_crew_must_register_before_race():
     with pytest.raises(ValueError, match="not officially registered"):
         race.run_race(team)
 
+
+# Test 11: Registered team with no Driver cannot race (Business Rule 2)
+def test_no_driver_cannot_race():
+    """Business Rule 2: Only crew members with the Driver role may enter a race."""
+    team = Team("Mechanics Only")
+    team.register_member("Bob Wrench", "Mechanic", skill_level=4)
+    team.inventory.add_car("ToolVan")
+    # Cannot complete registration without a Driver
+    # So we force is_registered to simulate a team that somehow got registered
+    # but has no Driver — this tests race.py's own driver check
+    team.roster.add_member("Temp Driver", "Driver")
+    team.complete_registration()
+    # Now remove the driver to simulate the edge case
+    team.roster.members = [m for m in team.roster.members if m.role != "Driver"]
+
+    race = Race("Street Circuit", 2)
+    with pytest.raises(ValueError, match="no Driver"):
+        race.run_race(team)

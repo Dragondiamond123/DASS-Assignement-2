@@ -14,7 +14,20 @@ class Inventory:
 
     def add_car(self, car_name):
         """Register a car to the team inventory."""
-        self.cars.append(car_name)
+        self.cars.append({"name": car_name, "is_damaged": False})
+
+    def get_ready_cars(self):
+        return [c for c in self.cars if not c["is_damaged"]]
+
+    def get_damaged_cars(self):
+        return [c for c in self.cars if c["is_damaged"]]
+
+    def repair_car(self, car_name):
+        for c in self.cars:
+            if c["name"] == car_name:
+                c["is_damaged"] = False
+                return True
+        return False
 
     def add_part(self, part_name, quantity=1):
         """Add spare parts to the inventory."""
@@ -42,5 +55,5 @@ class Inventory:
         return True
 
     def is_prepared(self):
-        """Check if team has minimum resources: at least 1 car and some cash."""
-        return len(self.cars) >= 1 and self.cash_balance >= 0
+        """Check if team has minimum resources: at least 1 ready car and some cash."""
+        return len(self.get_ready_cars()) >= 1 and self.cash_balance >= 0

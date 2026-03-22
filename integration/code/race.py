@@ -26,6 +26,12 @@ class Race:
         if not drivers:
             raise ValueError("Cannot race: Team has no Driver in crew!")
 
+        # Pick a ready car
+        ready_cars = team.inventory.get_ready_cars()
+        if not ready_cars:
+            raise ValueError("Cannot race: Team has no ready cars!")
+        car = ready_cars[0]
+
         # Driver skill affects performance
         avg_skill = sum(d.skill_level for d in drivers) / len(drivers)
         efficiency = avg_skill * 10
@@ -33,6 +39,10 @@ class Race:
         # Calculate race time
         base_time = self.difficulty * 100
         completion_time = base_time - efficiency + random.randint(0, 50)
+
+        # 30% chance for the car to get damaged during the race
+        if random.random() < 0.3:
+            car["is_damaged"] = True
 
         return {
             "team_id": team.team_id,

@@ -10,10 +10,10 @@ VALID_ROLES = ["Driver", "Mechanic", "Strategist", "Navigator"]
 class CrewMember:
     """Represents a single crew member with a role and skill level."""
 
-    def __init__(self, name, role, skill_level=1):
+    def __init__(self, name, role=None, skill_level=1):
         if not validate_string(name):
             raise ValueError("Invalid crew name.")
-        if role not in VALID_ROLES:
+        if role is not None and role not in VALID_ROLES:
             raise ValueError(f"Invalid role. Must be one of {VALID_ROLES}")
         if not (1 <= skill_level <= 5):
             raise ValueError("Skill level must be between 1 and 5.")
@@ -22,6 +22,12 @@ class CrewMember:
         self.role = role
         self.skill_level = skill_level
         self.is_ready = True
+
+    def assign_role(self, role):
+        """Assign or reassign a role to the crew member."""
+        if role not in VALID_ROLES:
+            raise ValueError(f"Invalid role. Must be one of {VALID_ROLES}")
+        self.role = role
 
     def is_driver(self):
         """Return True if this crew member is a Driver."""
@@ -34,13 +40,22 @@ class CrewRoster:
     def __init__(self):
         self.members = []
 
-    def add_member(self, name, role, skill_level=1):
-        """Add a new member to the roster."""
+    def add_member(self, name):
+        """Add a new member to the roster (without a role)."""
         if len(self.members) >= 8:
             raise OverflowError("Crew roster is full (max 8).")
-        member = CrewMember(name, role, skill_level)
+        member = CrewMember(name, role=None)
         self.members.append(member)
         return member
+
+    def assign_role_to_member(self, name, role, skill_level=1):
+        """Assign a role to an already registered member."""
+        for m in self.members:
+            if m.name == name:
+                m.assign_role(role)
+                m.skill_level = skill_level
+                return m
+        raise ValueError(f"Member {name} is not registered. Register first.")
 
     def get_drivers(self):
         """Return all members with the Driver role."""

@@ -38,6 +38,14 @@ class MissionControl:
                     f"Team '{team.name}' is missing this role."
                 )
 
+        # Business Rule 3: If a car is damaged, mechanic must be available
+        if team.inventory.get_damaged_cars():
+            if not team.roster.has_role("Mechanic"):
+                raise RuntimeError(
+                    "Car is damaged! Mission requires a Mechanic to proceed, "
+                    "but none is available in the crew."
+                )
+
         self.active_teams.append(team)
 
     def add_race(self, race: Race):

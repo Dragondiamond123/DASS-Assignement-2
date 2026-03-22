@@ -19,9 +19,14 @@ class Team:
         self.inventory = Inventory()   # Integration with inventory.py
         self.is_registered = False
 
-    def register_member(self, name, role, skill_level=1):
-        """Register a new crew member directly onto this team's roster."""
-        return self.roster.add_member(name, role, skill_level)
+    def register_member(self, name):
+        """Register a new crew member onto this team's roster without a role."""
+        # Business Rule 1: A crew member must be registered before role is assigned
+        return self.roster.add_member(name)
+
+    def assign_team_role(self, name, role, skill_level=1):
+        """Assign a role to a registered crew member."""
+        return self.roster.assign_role_to_member(name, role, skill_level)
 
     def complete_registration(self):
         """
